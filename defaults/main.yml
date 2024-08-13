@@ -1,0 +1,20 @@
+ufw_default_incoming_policy: "deny"
+ufw_default_outgoing_policy: "allow"
+ufw_enabled: true
+
+ufw_rules:
+    - name: 'Allow SSH'
+      rule: allow
+      port: '22'
+      from_ip: 'any'
+
+#ufw_rules:
+#    - name: 'Allow HTTP'
+#      rule: allow
+#      port: '80'
+#      proto: 'tcp'
+#      direction: 'in'
+#      from_ip: 'any'
+#      to_ip: 'any'
+#      delete: false
+#      log: false
