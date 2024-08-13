@@ -1,38 +1,45 @@
-Role Name
-=========
+# UFW Role
 
-A brief description of the role goes here.
+This Ansible role manages UFW (Uncomplicated Firewall) settings on Debian-based systems.
 
-Requirements
-------------
+## Requirements
 
-Any pre-requisites that may not be covered by Ansible itself or the role should be mentioned here. For instance, if the role uses the EC2 module, it may be a good idea to mention in this section that the boto package is required.
+- Ansible 2.1 or higher
+- Debian-based system
 
-Role Variables
---------------
+## Role Variables
 
-A description of the settable variables for this role should go here, including any variables that are in defaults/main.yml, vars/main.yml, and any variables that can/should be set via parameters to the role. Any variables that are read from other roles and/or the global scope (ie. hostvars, group vars, etc.) should be mentioned here as well.
+The following variables can be set to customize the role's behavior:
 
-Dependencies
-------------
+| Variable                      | Description                                                                 | Default Value |
+|-------------------------------|-----------------------------------------------------------------------------|---------------|
+| `ufw_default_incoming_policy` | Default policy for incoming traffic (e.g., `deny` or `allow`).              | `deny`        |
+| `ufw_default_outgoing_policy` | Default policy for outgoing traffic (e.g., `allow` or `deny`).              | `allow`       |
+| `ufw_rules`                   | List of UFW rules to apply. Each rule can have the following attributes:    |               |
+| `rule`                        | The rule action (e.g., `allow`, `deny`, `reject`, `limit`).                 |               |
+| `port`                        | The port number or range.                                                   |               |
+| `proto`                       | The protocol (default is `tcp`).                                            | `tcp`         |
+| `direction`                   | The direction of the traffic (`in` or `out`, default is `in`).              | `in`          |
+| `from_ip`                     | The source IP address (default is `any`).                                   | `any`         |
+| `to_ip`                       | The destination IP address (default is `any`).                              | `any`         |
+| `delete`                      | Whether to delete the rule (default is `false`).                            | `false`       |
+| `log`                         | Whether to log the rule (default is `false`).                               | `false`       |
+| `name`                        | A comment for the rule.                                                     |               |
+| `ufw_enabled`                 | Whether to enable UFW (default is `true`).                                  | `true`        |
 
-A list of other roles hosted on Galaxy should go here, plus any details in regards to parameters that may need to be set for other roles, or variables that are used from other roles.
+## Dependencies
 
-Example Playbook
-----------------
+None.
 
-Including an example of how to use your role (for instance, with variables passed in as parameters) is always nice for users too:
+## Example Playbook
 
-    - hosts: servers
-      roles:
-         - { role: username.rolename, x: 42 }
-
-License
--------
-
-BSD
-
-Author Information
-------------------
-
-An optional section for the role authors to include contact information, or a website (HTML is not allowed).
+```yaml
+- hosts: servers
+  roles:
+    - role: ufw
+      ufw_default_incoming_policy: deny
+      ufw_default_outgoing_policy: allow
+      ufw_rules:
+        - { rule: allow, port: 22, proto: tcp, direction: in, from_ip: any, to_ip: any, log: true, name: 'Allow SSH' }
+        - { rule: allow, port: 80, proto: tcp, direction: in, from_ip: any, to_ip: any, log: false, name: 'Allow HTTP' }
+      ufw_enabled: true
