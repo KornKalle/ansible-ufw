@@ -1,0 +1,42 @@
+---
+- name: Ensure UFW is installed
+  apt:
+    name: ufw
+    state: present
+  become: yes
+
+- name: Set default incoming policy
+  ufw:
+    direction: incoming
+    policy: "{{ ufw_default_incoming_policy }}"
+  become: yes
+  notify: Reload UFW
+
+- name: Set default outgoing policy
+  ufw:
+    direction: outgoing
+    policy: "{{ ufw_default_outgoing_policy }}"
+  become: yes
+  notify: Reload UFW
+
+- name: Apply UFW rules
+  ufw:
+    rule: "{{ item.rule }}"
+    port: "{{ item.port }}"
+    proto: "{{ item.proto | default('tcp') }}"
+    direction: "{{ item.direction | default('in') }}"
+    from_ip: "{{ item.from_ip | default('any') }}"
+    to_ip: "{{ item.to_ip | default('any') }}"
+    delete: "{{ item.delete | default('false') }}"
+    log: "{{ item.log | default('false') }}"
+    comment: "{{ item.name }}"
+  loop: "{{ ufw_rules }}"
+  become: yes
+  when: ufw_rules is defined
+  notify: Reload UFW
+
+- name: Ensure UFW is enabled
+  ufw:
+    state: "{{ 'enabled' if ufw_enabled else 'disabled' }}"
+  become: yes
+  notify: Reload UFW
